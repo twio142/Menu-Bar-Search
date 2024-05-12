@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "K3Pinyin",
+        "repositoryURL": "https://github.com/CrazyFanFan/K3Pinyin",
+        "state": {
+          "branch": null,
+          "revision": "fd15be901768236ea21ff5a9010da66cf3f03308",
+          "version": "2.0.0"
+        }
+      },
+      {
         "package": "SwiftProtobuf",
         "repositoryURL": "https://github.com/apple/swift-protobuf.git",
         "state": {

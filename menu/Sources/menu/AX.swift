@@ -19,7 +19,7 @@ let virtualKeys = [
     0x33: "⌫", // kVK_Delete
     0x35: "⎋", // kVK_Escape
     0x39: "⇪", // kVK_CapsLock
-    0x3f: "fn", // kVK_Function
+    0x3f: "🌐", // kVK_Function
     0x7a: "F1", // kVK_F1
     0x78: "F2", // kVK_F2
     0x63: "F3", // kVK_F3
@@ -52,26 +52,23 @@ let virtualKeys = [
 ]
 
 // let halfWidthSpace = " " // "🌐"
-let halfWidthSpace = ""
+let halfWidthSpace = " "
 
 func decode(modifiers: Int) -> String {
-    if modifiers == 0x18 { return "fn" }
+    if modifiers == 0x18 { return "🌐" }
     var result = [String]()
     if (modifiers & 0x04) > 0 { result.append("⌃") }
     if (modifiers & 0x02) > 0 { result.append("⌥") }
     if (modifiers & 0x01) > 0 { result.append("⇧") }
     if (modifiers & 0x08) == 0 { result.append("⌘") }
-    return result.joined(separator: halfWidthSpace)
+    return result.joined(separator: "")
 }
 
 func getShortcut(_ cmd: String?, _ modifiers: Int, _ virtualKey: Int) -> String {
     var shortcut: String? = cmd
-    if let s = shortcut {
-        if s.unicodeScalars[s.unicodeScalars.startIndex].value == 0x7f {
-            shortcut = "⌦"
-        }
-    }
-    else if virtualKey > 0 {
+    if let s = shortcut, s.unicodeScalars[s.unicodeScalars.startIndex].value == 0x7f {
+        shortcut = "⌦"
+    } else if virtualKey > 0 {
         if let lookup = virtualKeys[virtualKey] {
             shortcut = lookup
         }

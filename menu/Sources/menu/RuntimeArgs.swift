@@ -11,6 +11,7 @@ class RuntimeArgs {
     // process command line args
     // every argument is optional
     // [-query <filter>] - filter menu listing based on filter
+    // [-match-click <string>] - match for exact menu item title and click if found
     // [-pid <id>] - target app with specified pid, if none, menubar owning app is detected
     // [-max-depth <depth:10>]  - max traversal depth of app menu
     // [-max-children <count:20>] -  max set of child menu items to process under parent menu
@@ -24,6 +25,7 @@ class RuntimeArgs {
     // -dump - prints out debug dump, if present output from menu will not be compatible with Alfred
 
     var query = ""
+    var matchClick: [String] = []
     var pid: Int32 = -1
     var reorderAppleMenuToLast = true
     var learning = true
@@ -88,6 +90,16 @@ class RuntimeArgs {
                     query = arg.folding(options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive], locale: nil)
                     query = parseToShortcut(from: query)
                 }
+
+            case "-match-click":
+                advance()
+                while let arg = current, !arg.hasPrefix("-") {
+                    if !arg.isEmpty {
+                        matchClick += [arg]
+                    }
+                    advance()
+                }
+                i -= 1
 
             case "-max-depth":
                 advance()

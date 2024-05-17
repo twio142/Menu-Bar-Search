@@ -156,7 +156,6 @@ let r = render // prevent swiftc compiler segfault
 
 if !args.query.isEmpty {
     let term = args.query
-    
     menuItems
         .map { (menu: MenuItem) -> (menu: MenuItem, search: (matched: Bool, score: Int)) in
             var level = menu.path.count - 1
@@ -187,6 +186,18 @@ if !args.query.isEmpty {
         .forEach { item in
             r(item.menu)
         }
+}
+else if args.matchClick.count > 0 {
+    for term in args.matchClick {
+        if let match = menuItems.first(where: { $0.title == term }) {
+            let clickIndices = match.pathIndices.split(separator: ",").compactMap { Int($0) }
+            menuBar.click(pathIndices: clickIndices)
+            Cache.invalidate(app: appBundleId)
+            exit(0)
+        }
+    }
+    print("No menu item matched the term")
+    exit(0)
 }
 else if args.options.appFilter.showAppleMenu, args.reorderAppleMenuToLast, menuItems.count > 0 {
     // rearrange so that Apple menu items are last

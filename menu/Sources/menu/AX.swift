@@ -19,7 +19,7 @@ let virtualKeys = [
     0x33: "⌫", // kVK_Delete
     0x35: "⎋", // kVK_Escape
     0x39: "⇪", // kVK_CapsLock
-    0x3f: "🌐", // kVK_Function
+    0x3f: "􀆪", // kVK_Function
     0x7a: "F1", // kVK_F1
     0x78: "F2", // kVK_F2
     0x63: "F3", // kVK_F3
@@ -55,7 +55,7 @@ let virtualKeys = [
 let halfWidthSpace = " "
 
 func decode(modifiers: Int) -> String {
-    if modifiers == 0x18 { return "🌐" }
+    if modifiers == 0x18 { return "􀆪" }
     var result = [String]()
     if (modifiers & 0x04) > 0 { result.append("⌃") }
     if (modifiers & 0x02) > 0 { result.append("⌥") }
@@ -401,10 +401,10 @@ enum MenuGetter {
         var menuItems = [MenuItem]()
         let q: DispatchQueue
         if #available(macOS 10.10, *) {
-            q = DispatchQueue(label: "folded-paper.menu-bar", qos: .userInteractive, attributes: .concurrent)
+            q = DispatchQueue(label: "folded-paper.menubar", qos: .userInteractive, attributes: .concurrent)
         }
         else {
-            q = DispatchQueue(label: "folded-paper.menu-bar", attributes: .concurrent)
+            q = DispatchQueue(label: "folded-paper.menubar", attributes: .concurrent)
         }
         let group = DispatchGroup()
         guard let menuBarItems = getAttribute(element: menuBar, name: kAXChildrenAttribute) as? [AXUIElement],

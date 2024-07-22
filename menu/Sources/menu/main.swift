@@ -189,7 +189,8 @@ if !args.query.isEmpty {
 }
 else if args.matchClick.count > 0 {
     for term in args.matchClick {
-        if let match = menuItems.first(where: { $0.title == term }) {
+        let terms = term.split(separator: "\t").map { String($0) }
+        if let match = menuItems.first(where: { terms.count == 1 ? $0.title == term : $0.path == terms }) {
             let clickIndices = match.pathIndices.split(separator: ",").compactMap { Int($0) }
             menuBar.click(pathIndices: clickIndices)
             Cache.invalidate(app: appBundleId)

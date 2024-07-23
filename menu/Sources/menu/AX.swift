@@ -51,7 +51,6 @@ let virtualKeys = [
     0x7e: "▲", // kVK_UpArrow
 ]
 
-// let halfWidthSpace = " " // "🌐"
 let halfWidthSpace = " "
 
 func decode(modifiers: Int) -> String {
@@ -163,7 +162,7 @@ func getMenuItems(
             menuItem.shortcut = getShortcut(cmd, modifiers, virtualKey)
             menuItem.searchPath = menuItem.path.map { item in
                 let foldedItem = item.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
-                if !hasChinese(foldedItem) {
+                if !options.matchPinyin || !hasChinese(foldedItem) {
                     return foldedItem
                 }
                 let pinyin = foldedItem.k3.pinyin([.separator(" ")]).folding(options: .diacriticInsensitive, locale: nil)
@@ -356,6 +355,7 @@ struct MenuGetterOptions {
     var maxDepth = 10
     var maxChildren = 20
     var specificMenuRoot: String?
+    var matchPinyin = false
     var dumpInfo = false
     var appFilter = AppFilter()
     var recache = false

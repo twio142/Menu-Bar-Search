@@ -1,6 +1,27 @@
+A fork of [BenziAhamed/Menu-Bar-Search](https://github.com/BenziAhamed/Menu-Bar-Search) with a few
+additional features:
+
+- Support matching menu items by Chinese pinyin: `-match-pinyin true`.
+- Add `match-click` mode to directly click the menu item on **exact match**.
+
+### `match-click` mode, explained
+
+```shell
+# you can pass multiple strings to `-match-click`
+# the first one that matches will be clicked
+./menu [...] -match-click "Emoji & Symbols" "Emoji et symboles" "表情与符号"
+
+# you can also pass the full menu path, separated by `\t`
+./menu [...] -match-click "Edit\tAutoFill\tPasswords…"
+
+# this can be easily made into an external trigger in Alfred
+```
+
+---
+
 # <img src='assets/icon.png' width='35' align='center' alt='icon'> Menu Bar Search - An Alfred Workflow
 
-Quickly search through menu options of the front-most application. [↓ Download](https://github.com/BenziAhamed/Menu-Bar-Search/releases/latest/download/Menu.Bar.Search.alfredworkflow)
+Quickly search through menu options of the front-most application.
 
 <span>
   <img src='assets/finder.png' width='33%' alt='finder'> 

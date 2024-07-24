@@ -8,22 +8,31 @@
 import Foundation
 
 class RuntimeArgs {
-    // process command line args
-    // every argument is optional
-    // [-query <filter>] - filter menu listing based on filter
-    // [-match-click <string>...] - match for exact menu item title and click if found, multiple arguments supported, levels can be separated by '\t'
-    // [-pid <id>] - target app with specified pid, if none, menubar owning app is detected
-    // [-max-depth <depth:10>]  - max traversal depth of app menu
-    // [-max-children <count:20>] -  max set of child menu items to process under parent menu
-    // -reorder-apple-menu (true|false:true) - by default, orders Apple menu items to the last
-    // -match-pinyin (true|false:false) - match pinyin for menu item title
-    // -learning  (true|false:true)
-    // -click <json_index_path_to_menu_item> - clicks the menu path for the given pid app
-    // -async - enable GCD based collection of sub menu items
-    // -cache <timeout> - enable caching with specified timeout interval
-    // -no-apple-menu - disable outputing apple menu items
-    // -show-disabled true/false - if enabled, displays menu items that are marked as disabled
-    // -dump - prints out debug dump, if present output from menu will not be compatible with Alfred
+    let usage = """
+    Usage: menu [options]
+
+    Options:
+        [-query|-q <string>]          - filter menu listing based on string
+        [-pid <id>]                   - target app with the given pid, instead of the menubar owning app
+        [-only <root_menu>]           - only show items from the given root menu
+        [-max-depth <depth:10>]       - max traversal depth of menu
+        [-max-children <count:20>]    - max set of child items to process under each parent menu
+        [-match-pinyin]               - match pinyin for menu item title
+        [-match-click <title> ...]    - match for exact menu item title and click if found,
+                                        multiple arguments supported,
+                                        levels can be separated by `\\t` in each argument
+        [-click <menu_index_path>]    - click the menu path for the given pid app
+        [-learning <0|1:1>]           - toggle learning mode
+        [-async]                      - enable GCD based collection of sub menu items
+        [-cache <timeout>]            - enable caching with given timeout interval
+        [-recache]                    - forced recache
+        [-reorder-apple-menu <0|1:1>] - reorder Apple menu to the end
+        [-show-apple-menu]            - show Apple menu items
+        [-show-disabled]              - show disabled menu items
+        [-show-folders]               - output Alfred settings and cache folders
+        [-dump]                       - print debug dump (output not compatible with Alfred)
+        [-help|-h]                    - print this help message
+    """
 
     var query = ""
     var matchClick: [String] = []
@@ -81,11 +90,6 @@ class RuntimeArgs {
 
         while let arg = current {
             switch arg {
-            case "-pid":
-                addingToMatchClick = false
-                advance()
-                pid = parse(createInt32, "Expected integer after -pid")
-
             case "-query", "-q":
                 addingToMatchClick = false
                 advance()
@@ -94,6 +98,21 @@ class RuntimeArgs {
                     query = arg.folding(options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive], locale: nil)
                     query = parseToShortcut(from: query)
                 }
+
+            case "-pid":
+                addingToMatchClick = false
+                advance()
+                pid = parse(createInt32, "Expected integer after -pid")
+
+            case "-only":
+                addingToMatchClick = false
+                advance()
+                guard let specificMenuRoot = current else {
+                    Alfred.quit("Expected root menu name after -only")
+                    break
+                }
+                advance()
+                options.specificMenuRoot = specificMenuRoot
 
             case "-max-depth":
                 addingToMatchClick = false
@@ -105,26 +124,14 @@ class RuntimeArgs {
                 advance()
                 options.maxChildren = parse(createInt, "Expected number after -max-children")
 
-            case "-cache":
-                addingToMatchClick = false
-                advance()
-                cachingEnabled = true
-                cacheTimeout = parse(createDouble, "Expected timeout after -cache")
-
-            case "-reorder-apple-menu":
-                addingToMatchClick = false
-                advance()
-                reorderAppleMenuToLast = parse(createBool, "Expected true/false after -reorder-apple-menu")
-
             case "-match-pinyin":
                 addingToMatchClick = false
                 advance()
-                options.matchPinyin = parse(createBool, "Expected true/false after -match-pinyin")
+                options.matchPinyin = true
 
-            case "-learning":
-                addingToMatchClick = false
+            case "-match-click":
+                addingToMatchClick = true
                 advance()
-                learning = parse(createBool, "Expected true/false after -learning")
 
             case "-click":
                 addingToMatchClick = false
@@ -136,42 +143,43 @@ class RuntimeArgs {
                 advance()
                 clickIndices = IndexParser.parse(pathJson)
 
+            case "-learning":
+                advance()
+                addingToMatchClick = false
+                learning = parse(createBoolFromInt, "Expected 0/1 after -learning")
+
             case "-async":
                 addingToMatchClick = false
                 advance()
                 loadAsync = true
 
-            case "-show-apple-menu":
+            case "-cache":
                 addingToMatchClick = false
                 advance()
-                options.appFilter.showAppleMenu = parse(createBoolFromInt, "Expected 0/1 after -show-apple-menu")
+                cachingEnabled = true
+                cacheTimeout = parse(createDouble, "Expected timeout after -cache")
 
             case "-recache":
                 addingToMatchClick = false
                 advance()
-                options.recache = parse(createBoolFromInt, "Expected 0/1 after -recache")
+                options.recache = true
 
-            case "-only":
+            case "-reorder-apple-menu":
+                advance()
+                addingToMatchClick = false
+                reorderAppleMenuToLast = parse(createBoolFromInt, "Expected 0/1 after -reorder-apple-menu")
+
+            case "-show-apple-menu":
                 addingToMatchClick = false
                 advance()
-                guard let specificMenuRoot = current else {
-                    Alfred.quit("Expected root menu name after -only")
-                    break
-                }
-                options.specificMenuRoot = specificMenuRoot
+                options.appFilter.showAppleMenu = true
 
             case "-show-disabled":
                 addingToMatchClick = false
                 advance()
-                options.appFilter.showDisabledMenuItems = parse(createBoolFromInt, "Expected 0/1 after -show-disabled")
-
-            case "-dump":
-                addingToMatchClick = false
-                advance()
-                options.dumpInfo = true
+                options.appFilter.showDisabledMenuItems = true
 
             case "-show-folders":
-                addingToMatchClick = false
                 let a = Alfred()
                 let icon = AlfredResultItemIcon.with { $0.path = "icon.settings.png" }
                 a.add(AlfredResultItem.with {
@@ -213,9 +221,14 @@ class RuntimeArgs {
                 print(a.resultsJson)
                 exit(0)
 
-            case "-match-click":
-                addingToMatchClick = true
+            case "-dump":
+                addingToMatchClick = false
                 advance()
+                options.dumpInfo = true
+
+            case "-help", "-h":
+                print(usage)
+                exit(0)
 
             default:
                 if !arg.isEmpty && addingToMatchClick {

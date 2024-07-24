@@ -17,6 +17,9 @@ let package = Package(
         .executableTarget(
             name: "menu",
             dependencies: ["SwiftProtobuf", "K3Pinyin"],
+            resources: [
+                .process("MenuItem.proto")
+            ],
             linkerSettings: [
                 .unsafeFlags([
                     "-Xlinker", "-sectcreate",
@@ -24,7 +27,8 @@ let package = Package(
                     "-Xlinker", "__info_plist",
                     "-Xlinker", "Sources/Info.plist"
                 ])
-            ]),
+            ]
+        ),
         // .testTarget(
             // name: "menuTests",
             // dependencies: ["menu"]),

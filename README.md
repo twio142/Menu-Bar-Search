@@ -1,8 +1,10 @@
 A fork of [BenziAhamed/Menu-Bar-Search](https://github.com/BenziAhamed/Menu-Bar-Search) with a few
 additional features:
 
-- Support matching menu items by Chinese pinyin: `-match-pinyin true`.
+- Support matching menu items by Chinese pinyin: `-match-pinyin`.
 - Add `match-click` mode to directly click the menu item on **exact match**.
+
+Use `./menu -h` to see all available options.
 
 ### `match-click` mode, explained
 
@@ -12,7 +14,7 @@ additional features:
 ./menu [...] -match-click "Emoji & Symbols" "Emoji et symboles" "表情与符号"
 
 # you can also pass the full menu path, separated by `\t`
-./menu [...] -match-click "Edit\tAutoFill\tPasswords…"
+./menu [...] -match-click "Edit\tSpeech\tStart Speaking"
 
 # this can be easily made into an external trigger in Alfred
 ```

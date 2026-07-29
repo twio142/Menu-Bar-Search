@@ -137,9 +137,9 @@ func render(_ menu: MenuItem) {
   let apple = menu.appleMenuItem
   a.add(.with {
     $0.uid = args.learning ? "\(appBundleId)>\(menu.uid)" : ""
-    $0.title = menu.shortcut.isEmpty ? menu.title : "\(menu.title) - \(menu.shortcut)"
+    $0.title = menu.shortcut.isEmpty ? menu.title : "\(menu.title) – \(menu.shortcut)"
     $0.subtitle = menu.subtitle
-    $0.arg = menu.arg
+    $0.arg = args.useIndex ? menu.pathIndices : menu.arg
     $0.icon.path = apple ? "apple-icon.png" : appPath
     $0.icon.type = apple ? "" : "fileicon"
   })

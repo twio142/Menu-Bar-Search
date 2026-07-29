@@ -26,6 +26,7 @@ class RuntimeArgs {
       [-async]                      - enable GCD based collection of sub menu items
       [-cache <timeout>]            - enable caching with given timeout interval
       [-recache]                    - forced recache
+      [-use-index]                  - use the menu index path as arg instead of the menu path
       [-reorder-apple-menu <0|1:1>] - reorder Apple menu to the end
       [-show-apple-menu]            - show Apple menu items
       [-show-disabled]              - show disabled menu items
@@ -44,6 +45,7 @@ class RuntimeArgs {
   var loadAsync = false
   var cachingEnabled = false
   var cacheTimeout = 0.0
+  var useIndex = false
 
   var options = MenuGetterOptions()
 
@@ -163,6 +165,11 @@ class RuntimeArgs {
         addingToMatchClick = false
         advance()
         options.recache = true
+
+      case "-use-index":
+        addingToMatchClick = false
+        advance()
+        useIndex = true
 
       case "-reorder-apple-menu":
         advance()
